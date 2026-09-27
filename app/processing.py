@@ -26,7 +26,6 @@ from dataclasses import dataclass, field, asdict
 
 from PIL import Image, ImageFilter, ImageOps
 
-# Целевой формат кадра
 TARGET_W, TARGET_H = 1920, 1080
 
 # Форматы изображений, которые считаем допустимыми на входе
@@ -92,8 +91,7 @@ def hex_to_rgb(value: str) -> tuple[int, int, int]:
 
 
 def open_image(path: str) -> Image.Image:
-    """Открыть изображение и учесть ориентацию из EXIF (иначе фото с телефона
-       могут «лежать на боку»)"""
+    """Открыть изображение и учесть ориентацию из EXIF"""
     im = Image.open(path)
     im = ImageOps.exif_transpose(im)
     return im
@@ -130,7 +128,6 @@ def bg_blur(src: Image.Image, radius: int, tw: int = TARGET_W, th: int = TARGET_
     """Фон: растянутая и размытая копия исходника (способ по умолчанию)"""
     bg = _cover_resize(src.convert("RGB"), tw, th)
     bg = bg.filter(ImageFilter.GaussianBlur(max(1, radius)))
-    # чуть затемняем, чтобы основной кадр в центре читался лучше
     bg = Image.eval(bg, lambda p: int(p * 0.9))
     return bg
 
@@ -369,7 +366,7 @@ def write_reports(out_dir: str, results: list[ProcessResult], summary: dict) -> 
         )
     s = summary
     doc = f"""<!DOCTYPE html><html lang="ru"><head><meta charset="utf-8">
-<title>Отчёт — Разрешение под экран</title>
+<title>Отчёт</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
@@ -388,7 +385,7 @@ th,td{{border-bottom:1px solid #e6dac2;padding:9px 12px;text-align:left;vertical
 th{{font-family:"JetBrains Mono",monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:#8d7f6a;background:#f4ecdc}}
 td.n{{font-family:"JetBrains Mono",monospace}}
 </style></head><body>
-<p class="kick">Тема 29 — сводный отчёт</p>
+<p class="kick">сводный отчёт</p>
 <h1>Приведение к формату {s['target']}</h1>
 <div class="rule"></div>
 <div class="sum">
