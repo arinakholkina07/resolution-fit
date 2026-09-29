@@ -1,0 +1,8 @@
+services:
+  resfit:
+    build: .
+    image: resolution-fit:latest
+    container_name: resolution-fit
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
