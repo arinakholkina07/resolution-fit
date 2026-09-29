@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Разрешение под экран: приведение к 1920×1080</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600;1,700&family=Golos+Text:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<div class="page">
+
+  <header class="masthead">
+    <div>
+      <p class="kicker">Тема 29: приведение изображений к экранному формату</p>
+      <h1 class="title">Разрешение <em>под&nbsp;экран</em></h1>
+    </div>
+    <div class="masthead-figure">
+      <span class="fig-label">целевой формат</span>
+      <span class="fig-num">1920×1080</span>
+    </div>
+  </header>
+  <div class="masthead-rule"></div>
+
+  <main class="wrap">
+
+    <aside class="rail">
+      <section class="block">
+        <div class="block-head"><span class="idx">01</span><h2>Источник</h2></div>
+        <p class="lede">Загрузите папку или отдельные изображения, либо возьмите встроенный тестовый датасет</p>
+
+        <div id="drop" class="drop" tabindex="0" role="button" aria-label="Область загрузки изображений">
+          <strong>Перетащите файлы сюда</strong>
+          или выберите ниже
+          <span class="exts">jpg png webp bmp gif tiff</span>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn" id="btnFiles">Файлы</button>
+          <button class="btn" id="btnFolder">Папка</button>
+          <button class="btn solid" id="btnSamples">Тестовый датасет</button>
+        </div>
+        <input type="file" id="inputFiles" multiple accept="image/*" class="hidden">
+        <input type="file" id="inputFolder" multiple webkitdirectory directory class="hidden">
+
+        <div class="rail-status">
+          <span class="count"><span id="fileCount">0</span> изображ.</span>
+          <button class="btn link" id="btnReset">Очистить</button>
+        </div>
+        <div class="files" id="files" aria-live="polite"></div>
+      </section>
+    </aside>
+
+    <div class="main">
+
+      <section class="block">
+        <div class="block-head"><span class="idx">02</span><h2>Настройки</h2></div>
+        <p class="lede">Меняйте параметры: предпросмотр «до / после» обновится сразу для выбранного изображения</p>
+
+        <div class="grid2">
+          <div class="field">
+            <label for="fill">Способ заполнения краёв</label>
+            <select id="fill">
+              <option value="blur">Размытие исходника (по умолчанию)</option>
+              <option value="solid">Сплошной цвет</option>
+              <option value="gradient">Градиент</option>
+              <option value="mirror">Зеркальное отражение</option>
+            </select>
+          </div>
+
+          <div class="field" id="wrapBlur">
+            <label for="blur">Сила размытия <span class="sub">(радиус, px)</span></label>
+            <div class="range-row">
+              <input type="range" id="blur" min="5" max="80" value="40">
+              <output id="blurOut" class="mono">40</output>
+            </div>
+          </div>
+
+          <div class="field hidden" id="wrapSolid">
+            <label for="solid">Цвет заливки</label>
+            <input type="color" id="solid" value="#241910">
+          </div>
+
+          <div class="field hidden" id="wrapGrad1">
+            <label for="grad1">Градиент - верх</label>
+            <input type="color" id="grad1" value="#5a6033">
+          </div>
+          <div class="field hidden" id="wrapGrad2">
+            <label for="grad2">Градиент - низ</label>
+            <input type="color" id="grad2" value="#23190f">
+          </div>
+
+          <div class="field">
+            <label for="threshold">Порог отбраковки <span class="sub">(масштаб ≥)</span></label>
+            <input type="number" id="threshold" min="1" max="10" step="0.1" value="2.0">
+          </div>
+
+          <div class="field">
+            <label>Формат вывода</label>
+            <div class="seg" id="fmtSeg" role="group" aria-label="Формат вывода">
+              <button data-fmt="webp" class="on">WebP</button>
+              <button data-fmt="jpeg">JPEG</button>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="quality">Качество веб-оптимизации</label>
+            <div class="range-row">
+              <input type="range" id="quality" min="40" max="100" value="82">
+              <output id="qualityOut" class="mono">82</output>
+            </div>
+          </div>
+
+          <div class="field" style="justify-content:flex-end">
+            <label class="switch">
+              <input type="checkbox" id="keepMeta">
+              Сохранять метаданные (EXIF / ICC)
+            </label>
+            <span class="sub">по умолчанию вырезаются для веб-оптимизации</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="block">
+        <div class="preview-top">
+          <div class="block-head" style="flex:1"><span class="idx">03</span><h2>Предпросмотр «до / после»</h2></div>
+        </div>
+        <div style="text-align:right;margin:-8px 0 10px"><span id="previewMeta"></span></div>
+        <div id="previewEmpty" class="preview-empty">Выберите изображение слева, чтобы увидеть результат</div>
+        <div id="previewBody" class="ba hidden">
+          <figure>
+            <figcaption>Исходник</figcaption>
+            <div class="frame"><img id="imgBefore" alt="Исходное изображение"></div>
+          </figure>
+          <figure>
+            <figcaption>Результат 1920×1080</figcaption>
+            <div class="frame"><img id="imgAfter" alt="Результат приведения к формату"></div>
+          </figure>
+        </div>
+      </section>
+
+      <section class="block">
+        <div class="block-head"><span class="idx">04</span><h2>Обработка и результат</h2></div>
+        <div class="actions">
+          <button class="btn solid lg" id="btnProcess">Обработать все изображения</button>
+          <button class="btn olive lg hidden" id="btnDownload">Скачать результат (zip)</button>
+          <button class="btn link hidden" id="btnReport">Открыть отчёт</button>
+        </div>
+
+        <div id="results" class="hidden">
+          <div class="stats" id="tiles"></div>
+          <div class="ledger-wrap">
+            <table class="ledger">
+              <thead><tr>
+                <th>Файл</th><th>Статус</th><th>Исходник</th><th>Масштаб</th>
+                <th>Результат</th><th>Было</th><th>Стало</th><th>Экономия</th><th>Причина</th>
+              </tr></thead>
+              <tbody id="resBody"></tbody>
+            </table>
+          </div>
+        </div>
+        <p id="noResults" class="muted">Результатов пока нет. Загрузите изображения и нажмите «Обработать»</p>
+      </section>
+
+    </div>
+  </main>
+
+  <footer class="foot">
+    <span>Разрешение под экран</span>
+    <span>вписывание / заполнение полей / веб-оптимизация / отбраковка</span>
+  </footer>
+
+</div>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>
