@@ -22,7 +22,7 @@ import os
 import csv
 import json
 import html
-from dataclasses import dataclass, field, asdict
+from dataclasses import dataclass, asdict
 
 from PIL import Image, ImageFilter, ImageOps
 
@@ -104,12 +104,6 @@ def compute_fit(w: int, h: int, tw: int = TARGET_W, th: int = TARGET_H):
     new_w = max(1, round(w * scale))
     new_h = max(1, round(h * scale))
     return scale, new_w, new_h
-
-
-def average_color(im: Image.Image) -> tuple[int, int, int]:
-    """Средний цвет изображения"""
-    small = im.convert("RGB").resize((1, 1), Image.LANCZOS)
-    return small.getpixel((0, 0))
 
 
 #  Построение фона (заполнение пустых полей кадра)
